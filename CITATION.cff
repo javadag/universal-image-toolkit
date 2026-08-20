@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software in your research or project, please cite it as below."
+authors:
+  - name: "Universal Image Toolkit Contributors"
+title: "Universal Image Toolkit: Cross-Platform Image Optimizer and Converter"
+version: 1.0.0
+date-released: 2026-08-20
+url: "https://github.com/javadag/universal-image-toolkit"
+keywords:
+  - image-processing
+  - image-converter
+  - image-optimizer
+  - photo-resizer
+  - webp-converter
+  - customtkinter
+  - pillow
+  - python
