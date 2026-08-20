@@ -1,4 +1,4 @@
-name: Build & Publish Release
+name: Auto Tag & Publish Release
 
 on:
   push:
@@ -12,8 +12,30 @@ permissions:
   contents: write
 
 jobs:
+  tag:
+    name: Generate Semantic Version Tag
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.tag_version.outputs.new_tag || github.ref_name }}
+      changelog: ${{ steps.tag_version.outputs.changelog }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calculate & Create Next Version Tag
+        if: github.ref == 'refs/heads/main'
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          tag_prefix: v
+
   build:
     name: Build (${{ matrix.os }})
+    needs: tag
     runs-on: ${{ matrix.os }}
     env:
       PYTHONIOENCODING: utf-8
@@ -34,6 +56,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -74,8 +98,8 @@ jobs:
           path: ${{ matrix.asset_path }}
 
   release:
-    name: Create or Update GitHub Release
-    needs: build
+    name: Publish Official GitHub Release
+    needs: [tag, build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -87,25 +111,13 @@ jobs:
           path: release_assets
           merge-multiple: true
 
-      - name: Determine Release Tag & Title
-        id: release_info
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-            echo "release_name=Release ${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-          else
-            echo "tag_name=latest" >> $GITHUB_OUTPUT
-            echo "release_name=Latest Rolling Release (main)" >> $GITHUB_OUTPUT
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-          fi
-
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.release_info.outputs.tag_name }}
-          name: ${{ steps.release_info.outputs.release_name }}
+          tag_name: ${{ needs.tag.outputs.new_tag }}
+          name: Release ${{ needs.tag.outputs.new_tag }}
+          body: ${{ needs.tag.outputs.changelog }}
           files: release_assets/*
           generate_release_notes: true
           draft: false
-          prerelease: ${{ steps.release_info.outputs.is_prerelease == 'true' }}
+          prerelease: false
