@@ -250,16 +250,6 @@ We welcome contributions from developers of all skill levels! Whether you want t
 
 ---
 
-## 🗺️ Roadmap & Upcoming Features
-
-- [ ] **Watermarking & Text Annotations**: Visual text/logo overlay with opacity and position controls.
-- [ ] **Vercel Serverless Web Version**: Cloud deployment option using FastAPI and HTML5 Canvas.
-- [ ] **AI-Powered Upscaling**: Integration with lightweight super-resolution models (ESRGAN/Real-ESRGAN).
-- [ ] **Color Grading & Filters**: Brightness, Contrast, Saturation, Sharpness, and LUT preset filters.
-- [ ] **EXIF Editor**: Edit camera tags, copyright notices, and timestamps before export.
-
----
-
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details. You are free to use, modify, distribute, and embed this project in commercial and private software.
