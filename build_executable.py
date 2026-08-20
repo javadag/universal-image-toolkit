@@ -11,11 +11,19 @@ import sys
 from pathlib import Path
 
 
+# Ensure standard output uses UTF-8 across all operating systems and Windows codepages
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+
 def build():
     current_os = platform.system()
-    print(f"==================================================")
+    print("=" * 50)
     print(f"  Building Universal Image Toolkit for {current_os}")
-    print(f"==================================================")
+    print("=" * 50)
 
     base_dir = Path(__file__).parent.resolve()
     app_entry = base_dir / "app.py"
@@ -64,7 +72,7 @@ def build():
 
     if result.returncode == 0:
         print("\n" + "=" * 50)
-        print("🎉 Build Succeeded!")
+        print("[SUCCESS] Build Completed Successfully!")
         print("=" * 50)
         if current_os == "Windows":
             print(f"Standalone Portable Executable: {dist_dir / 'UniversalImageToolkit.exe'}")
@@ -74,7 +82,7 @@ def build():
             print(f"Standalone Portable Binary: {dist_dir / 'UniversalImageToolkit'}")
         print("\nYou can now distribute this single file anywhere without needing Python installed!")
     else:
-        print("\n❌ Build Failed. See logs above for details.")
+        print("\n[ERROR] Build Failed. See logs above for details.")
         sys.exit(result.returncode)
 
 
